@@ -1,33 +1,21 @@
-# Use a base image with JDK and Maven installed
-FROM maven:3.8.4-jdk-11 AS build
+# Use a base image with JDK, Maven, and Tomcat installed
+FROM tomcat:9-jdk11-openjdk-slim AS build
+
+# Install Maven
+RUN apt-get update && apt-get install -y maven && apt-get clean
 
 # Set up environment variables
-ENV TOMCAT_VERSION 9.0.56
-ENV CATALINA_HOME /opt/tomcat
-
-# Install necessary tools
-RUN apt-get update && \
-    apt-get install -y wget && \
-    rm -rf /var/lib/apt/lists/*
-
-# Download and extract Apache Tomcat
-RUN wget https://downloads.apache.org/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz -O /tmp/tomcat.tar.gz && \
-    mkdir -p $CATALINA_HOME && \
-    tar xf /tmp/tomcat.tar.gz --strip-components=1 -C $CATALINA_HOME && \
-    rm /tmp/tomcat.tar.gz
-
-# Remove unnecessary files and directories
-RUN rm -rf $CATALINA_HOME/webapps/examples $CATALINA_HOME/webapps/docs $CATALINA_HOME/webapps/ROOT $CATALINA_HOME/webapps/host-manager $CATALINA_HOME/webapps/manager
+ENV MAVEN_HOME /usr/share/maven
 
 # Copy the Maven project into the container
 COPY . /usr/src/app
 WORKDIR /usr/src/app
-
+RUN rm -rf /usr/src/app/target
 # Build the Maven project
 RUN mvn clean install
 
 # Copy the WAR file to the Tomcat webapps directory
-RUN cp target/*.war $CATALINA_HOME/webapps/dockeransible.war
+RUN cp target/*.war $CATALINA_HOME/webapps/
 
 # Expose the default Tomcat port
 EXPOSE 8080
