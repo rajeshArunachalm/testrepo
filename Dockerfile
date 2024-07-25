@@ -11,7 +11,7 @@ COPY memory_stress_test.py .
 RUN pip install flask
 
 # Expose port 3000
-EXPOSE 3000
+EXPOSE 8080
 
 # Run the Python script
 CMD ["python", "memory_stress_test.py"]
