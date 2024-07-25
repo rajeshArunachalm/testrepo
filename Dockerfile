@@ -1,24 +1,18 @@
-# Use a base image with JDK, Maven, and Tomcat installed
-FROM tomcat:9-jdk11-openjdk-slim AS build
+# Dockerfile
+FROM python:3.9-slim
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven && apt-get clean
+# Set the working directory
+WORKDIR /app
 
-# Set up environment variables
-ENV MAVEN_HOME /usr/share/maven
+# Copy the Python script into the container
+COPY memory_stress_test.py .
 
-# Copy the Maven project into the container
-COPY . /usr/src/app
-WORKDIR /usr/src/app
-RUN rm -rf /usr/src/app/target
-# Build the Maven project
-RUN mvn clean install
+# Install Flask
+RUN pip install flask
 
-# Copy the WAR file to the Tomcat webapps directory
-RUN cp target/*.war $CATALINA_HOME/webapps/
+# Expose port 3000
+EXPOSE 3000
 
-# Expose the default Tomcat port
-EXPOSE 8080
+# Run the Python script
+CMD ["python", "memory_stress_test.py"]
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
