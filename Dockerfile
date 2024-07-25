@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the Python script into the container
-COPY cpu_stress_test.py .
+COPY file_generation.py .
 
 # Install Flask
 RUN pip install flask
@@ -14,5 +14,5 @@ RUN pip install flask
 EXPOSE 8080
 
 # Run the Python script
-CMD ["python", "cpu_stress_test.py"]
+CMD ["python", "file_generation.py"]
 
