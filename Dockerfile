@@ -5,14 +5,14 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the Python script into the container
-COPY memory_stress_test.py .
+COPY cpu_stress_test.py .
 
 # Install Flask
 RUN pip install flask
 
-# Expose port 3000
-EXPOSE 3000
+# Expose port 8080
+EXPOSE 8080
 
 # Run the Python script
-CMD ["python", "memory_stress_test.py"]
+CMD ["python", "cpu_stress_test.py"]
 
