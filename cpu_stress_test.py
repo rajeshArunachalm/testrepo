@@ -24,8 +24,8 @@ def get_cpu_usage():
     return jsonify(cpu_usage)
 
 if __name__ == "__main__":
-    initial_load = 0.1  # Initial CPU load in seconds
-    increment_load = 0.1  # Increment load in seconds
+    initial_load = 0.5  # Initial CPU load in seconds
+    increment_load = 0.9  # Increment load in seconds
     sleep_time = 1  # Sleep time between increments in seconds
 
     # Start the CPU stress test in a separate thread
