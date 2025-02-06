@@ -18,7 +18,7 @@ RUN mvn clean install
 RUN cp target/*.war $CATALINA_HOME/webapps/
 
 # Expose the default Tomcat port
-EXPOSE 8080
+EXPOSE 9443
 
 # Start Tomcat
 CMD ["catalina.sh", "run"]
