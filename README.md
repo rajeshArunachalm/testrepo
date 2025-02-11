@@ -1,10 +1,3 @@
-git clone reponame
+node application, running on port 9443
 
-cd reponame
-
-docker build -t imagename:latest .
-
-
-docker run -d -p 5000:5000 imagename:latest
-
-url : http://(localhostORip):5000
+output : just show message hello superstar
