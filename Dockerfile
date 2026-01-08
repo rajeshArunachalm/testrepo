@@ -15,8 +15,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build arguments for environment variables (must be provided)
-ARG NEXT_PUBLIC_GRAPHQL_API_URL
+# Set NEXT_PUBLIC_GRAPHQL_API_URL (can be overridden with build arg)
+ARG NEXT_PUBLIC_GRAPHQL_API_URL=https://sunny-props-backend.toystack.dev/graphql
 ENV NEXT_PUBLIC_GRAPHQL_API_URL=$NEXT_PUBLIC_GRAPHQL_API_URL
 
 # Build the application
@@ -44,4 +44,5 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
+
 
