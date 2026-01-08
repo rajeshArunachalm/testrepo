@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Define font variable safely in :root */
+:root {
+  --font-primary: var(--font-mulish, sans-serif);
+}
+
+/* Use normal CSS to set font */
+* {
+  font-family: var(--font-primary);
+}

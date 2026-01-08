@@ -1,24 +1,53 @@
-# Use a base image with JDK, Maven, and Tomcat installed
-FROM tomcat:9-jdk11-openjdk-slim AS build
+FROM node:22-alpine AS base
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven && apt-get clean
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
 
-# Set up environment variables
-ENV MAVEN_HOME /usr/share/maven
+RUN apk add --no-cache libc6-compat
 
-# Copy the Maven project into the container
-COPY . /usr/src/app
-WORKDIR /usr/src/app
-RUN rm -rf /usr/src/app/target
-# Build the Maven project
-RUN mvn clean install
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
 
-# Copy the WAR file to the Tomcat webapps directory
-RUN cp target/*.war $CATALINA_HOME/webapps/
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
 
-# Expose the default Tomcat port
-EXPOSE 8080
+# ENV NEXT_TELEMETRY_DISABLED=1
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN \
+  if [ -f yarn.lock ]; then yarn run build; \
+  elif [ -f package-lock.json ]; then npm run build; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+# ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
