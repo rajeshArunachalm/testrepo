@@ -1,24 +1,13 @@
-# Use a base image with JDK, Maven, and Tomcat installed
-FROM tomcat:9-jdk11-openjdk-slim AS build
+FROM python:3.10-slim
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven && apt-get clean
+WORKDIR /app
 
-# Set up environment variables
-ENV MAVEN_HOME /usr/share/maven
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Maven project into the container
-COPY . /usr/src/app
-WORKDIR /usr/src/app
-RUN rm -rf /usr/src/app/target
-# Build the Maven project
-RUN mvn clean install
+COPY app.py .
+COPY best_fish_model.pth .
 
-# Copy the WAR file to the Tomcat webapps directory
-RUN cp target/*.war $CATALINA_HOME/webapps/
+EXPOSE 8000
 
-# Expose the default Tomcat port
-EXPOSE 8080
-
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
