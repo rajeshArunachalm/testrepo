@@ -1,0 +1,35 @@
+############################
+# Python / environment
+############################
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+fish_env/
+.env
+.env.*
+
+############################
+# Local data & datasets
+############################
+dataset/
+data/
+*.csv
+*.tsv
+*.parquet
+
+############################
+# Training scripts & models (keep local only)
+############################
+check_dataset.py
+final_fish_model.py
+load.py
+predict.py
+train.py
+
+models/
+*.pt
+*.pth
+*.h5
+*.joblib
+*.pkl
